@@ -34,7 +34,6 @@ function toggleFullscreen() {
 
 function handleFullscreenChange() {
     let fullscreenButton = document.getElementById("fullscreenbutton");
-    console.log('screen size changed')
     if (document.fullscreenElement) {
         fullscreenButton.style.display = "none"; // Hide button in fullscreen
     } else {
