@@ -4,14 +4,20 @@
     <title>QR Code</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" type="text/css" href="src/style.css">
-    <script src="src/control.js"></script>
+    <script src="src/control.js"></script> 
 </head>
 <body>
-    <button onclick="toggleFullscreen()" id="fullscreenbutton"> Click To View</button>
-    <div class="container">
-        <img src="src/images/ss_bat.jpg" alt="battery_ss" height="100%">
-        <div id="qrcode">
-            
+   
+
+    <div id="qr_container">
+        <div id="qr_code">
         </div>
+    </div>
+    <div id="input_container">
+        <input type="text" value="MUM_" placeholder="qr code" oninput="changeStaticQr(this)">
+    </div>
+    
+    <div id="button_container">
+        <button onclick="generateDynamicQRCodeImg()" > dynamic qr </button>
     </div>
 </html>

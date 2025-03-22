@@ -1,57 +1,71 @@
-function openFullscreen() {
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
-        document.documentElement.mozRequestFullScreen();
-    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
-        document.documentElement.webkitRequestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
-        document.documentElement.msRequestFullscreen();
+let qr_changer = null;
+
+function changeStaticQr(text){
+    if (qr_changer != null){
+        clearTimeout(qr_changer);
+        qr_changer = null;
     }
+    let qr = document.getElementById("qr_code");
+    
+    qr.innerHTML = "";
+    new QRCode(qr, {
+        text: text.value,
+        width: 500,
+        height: 500
+    });
+};
+
+
+
+// Counter to mimic 'cnt' from Python
+let cnt = 100;
+
+// Function to pad numbers with leading zeros
+function pad(num, size) {
+    let s = "000" + num;
+    return s.substr(s.length - size);
 }
 
-function closeFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { // Firefox
-        document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
-        document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { // IE/Edge
-        document.msExitFullscreen();
-    }
+// Function to get UTC timestamp formatted as in Python
+function getFormattedUTCTime() {
+    const now = new Date();
+
+    const year = now.getUTCFullYear();
+    const month = pad(now.getUTCMonth() + 1, 2);
+    const day = pad(now.getUTCDate(), 2);
+    const hours = pad(now.getUTCHours(), 2);
+    const minutes = pad(now.getUTCMinutes(), 2);
+    
+    const seconds = now.getUTCSeconds();
+    const roundedSeconds = Math.floor(seconds / 15) * 15;
+    const secondsStr = pad(roundedSeconds, 2);
+
+    const cntStr = pad(cnt, 3);
+    cnt += 1;
+    if (cnt > 320) cnt = 100;
+
+    return `${year}-${month}-${day}_${hours}:${minutes}:${secondsStr}.${cntStr}.UTC`;
 }
 
+// Main QR code generation function
+function generateDynamicQRCodeImg() {
+    uuid = "37b900f0-25c0-448b-825a-74d62c8ceb41"
+    const timestamp = getFormattedUTCTime();
+    const qrData = `${uuid}_${timestamp}`;
 
+    // Clear previous QR code
+    const qrContainer = document.getElementById("qr_code");
+    qrContainer.innerHTML = "";
 
-function toggleFullscreen() {
-    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-        closeFullscreen();
-    } else {
-        openFullscreen();
-    }
+    // Generate new QR code
+    new QRCode(qrContainer, {
+        text: qrData,
+        width: 500,  // similar to 21x21 box with 10 size
+        height: 500,
+        // colorDark: "#000000",
+        // colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
+    });
+
+    qr_changer = setTimeout(generateDynamicQRCodeImg, 100);
 }
-
-function handleFullscreenChange() {
-    let fullscreenButton = document.getElementById("fullscreenbutton");
-    if (document.fullscreenElement) {
-        fullscreenButton.style.display = "none"; // Hide button in fullscreen
-    } else {
-        fullscreenButton.style.display = "block"; // Show button when exiting fullscreen
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("fullscreenchange",handleFullscreenChange)
-    // let battery_code = prompt("Enter text to generate QR Code:","B3453");
-    let userID = "D69009";
-    let curTimestamp=new Date()-0;
-    curTimestamp=Math.floor(curTimestamp/1000);
-    if (userID) {
-        new QRCode(document.getElementById('qrcode'), {
-            text: `${userID}-${curTimestamp}`,
-            width: 185,
-            height: 178
-        });
-    }
-});
